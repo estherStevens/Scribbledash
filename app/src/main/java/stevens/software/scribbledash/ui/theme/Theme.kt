@@ -12,6 +12,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.ReadOnlyComposable
 
 private val DarkColorScheme = darkColorScheme(
     primary = Primary,
@@ -71,14 +72,24 @@ fun ScribbleDashTheme(
 
 val localExtendedColors = compositionLocalOf { extendedColors }
 
+val MaterialTheme.extendedColours: ExtendedColors
+    @Composable
+    @ReadOnlyComposable
+    get() = localExtendedColors.current
+
 data class ExtendedColors(
     val success: Color,
     val onPrimaryOpacity: Color,
-    val onBackgroundVariant: Color
+    val onBackgroundVariant: Color,
+    val backgroundLightGradient: Color,
+    val backgroundDarkGradient: Color
 )
 
 val extendedColors = ExtendedColors(
     success = Success,
     onPrimaryOpacity = OnPrimaryOpacity,
-    onBackgroundVariant = OnBackgroundVariant
+    onBackgroundVariant = OnBackgroundVariant,
+    backgroundLightGradient = BackgroundLightGradient,
+    backgroundDarkGradient = BackgroundDarkGradient
 )
+

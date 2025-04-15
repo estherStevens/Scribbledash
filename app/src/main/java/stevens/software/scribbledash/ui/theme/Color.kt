@@ -17,6 +17,10 @@ val SurfaceVariant = Color(0xFFF6F1EC)
 val SurfaceContainerLow = Color(0xFFEEE7E0)
 val SurfaceContainerLowest = Color(0xFFE1D5CA)
 val OnBackgroundVariant = Color(0xFF7F7163)
+val BackgroundLightGradient = Color(0xFFFEFAF6)
+val BackgroundDarkGradient = Color(0xFFFFF1E2)
+
+
 
 
 
