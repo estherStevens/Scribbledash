@@ -4,9 +4,12 @@ import android.inputmethodservice.Keyboard.Row
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -37,6 +41,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import stevens.software.scribbledash.ui.theme.extendedColours
 
@@ -63,12 +68,34 @@ fun HomeScreen(
             )
         },
         content = { padding ->
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(backgroundColour())
                     .padding(padding)
-            )
+                    .padding(top = 80.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(R.string.home_header),
+                    style = TextStyle(
+                        fontFamily = bagelFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 44.sp
+                    )
+                )
+                Spacer(Modifier.size(8.dp))
+                Text(
+                    text = stringResource(R.string.home_subheader),
+                    style = TextStyle(
+                        fontFamily = outfitFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.extendedColours.onBackgroundVariant,
+                        fontSize = 16.sp
+                    )
+                )
+            }
         },
         bottomBar = {
             BottomNavBar()
@@ -77,7 +104,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun BottomNavBar(){
+private fun BottomNavBar() {
     var selectedItem by remember { mutableStateOf(BottomNavItem.HOME) }
     val homeSelected = selectedItem == BottomNavItem.HOME
     val chartSelected = selectedItem == BottomNavItem.CHART
