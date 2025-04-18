@@ -47,16 +47,9 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun ScribbleDashTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
@@ -82,7 +75,8 @@ data class ExtendedColors(
     val onPrimaryOpacity: Color,
     val onBackgroundVariant: Color,
     val backgroundLightGradient: Color,
-    val backgroundDarkGradient: Color
+    val backgroundDarkGradient: Color,
+    val surfaceLowest: Color
 )
 
 val extendedColors = ExtendedColors(
@@ -90,6 +84,7 @@ val extendedColors = ExtendedColors(
     onPrimaryOpacity = OnPrimaryOpacity,
     onBackgroundVariant = OnBackgroundVariant,
     backgroundLightGradient = BackgroundLightGradient,
-    backgroundDarkGradient = BackgroundDarkGradient
+    backgroundDarkGradient = BackgroundDarkGradient,
+    surfaceLowest = SurfaceLowest
 )
 

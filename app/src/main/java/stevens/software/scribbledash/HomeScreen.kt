@@ -12,7 +12,13 @@ import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -22,14 +28,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import stevens.software.scribbledash.ui.theme.extendedColours
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,8 +51,12 @@ fun HomeScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.home_title),
-                        fontFamily = bagelFontFamily,
-                        fontWeight = FontWeight.Normal
+                        style = TextStyle(
+                            fontFamily = bagelFontFamily,
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 26.sp
+                        )
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
@@ -57,10 +69,54 @@ fun HomeScreen(
                     .background(backgroundColour())
                     .padding(padding)
             )
+        },
+        bottomBar = {
+            BottomNavBar()
         }
     )
 }
 
+@Composable
+private fun BottomNavBar(){
+    var selectedItem by remember { mutableStateOf(BottomNavItem.HOME) }
+    val homeSelected = selectedItem == BottomNavItem.HOME
+    val chartSelected = selectedItem == BottomNavItem.CHART
+
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+    ) {
+        NavigationBarItem(
+            selected = chartSelected,
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.chart),
+                    contentDescription = stringResource(R.string.chart),
+                )
+            },
+            onClick = { selectedItem = BottomNavItem.CHART },
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = MaterialTheme.extendedColours.surfaceLowest,
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                indicatorColor = Color.Transparent
+            )
+        )
+        NavigationBarItem(
+            selected = homeSelected,
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.home),
+                    contentDescription = stringResource(R.string.home),
+                )
+            },
+            onClick = { selectedItem = BottomNavItem.HOME },
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = MaterialTheme.extendedColours.surfaceLowest,
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                indicatorColor = Color.Transparent
+            )
+        )
+    }
+}
 
 @Composable
 fun backgroundColour() = Brush.verticalGradient(
@@ -72,7 +128,7 @@ fun backgroundColour() = Brush.verticalGradient(
 
 @Preview
 @Composable
-fun HomeScreenPreview(){
+fun HomeScreenPreview() {
     MaterialTheme {
         HomeScreen()
     }
