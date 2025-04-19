@@ -3,6 +3,7 @@ package stevens.software.scribbledash
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,7 +43,7 @@ import stevens.software.scribbledash.ui.theme.extendedColours
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-
+    onNavigateToOneRoundWonder: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -91,7 +92,9 @@ fun HomeScreen(
                     )
                 )
                 Spacer(Modifier.size(20.dp))
-                OneRoundWonder()
+                OneRoundWonder(
+                    onNavigateToOneRoundWonder = onNavigateToOneRoundWonder
+                )
             }
         },
         bottomBar = {
@@ -101,7 +104,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun OneRoundWonder(){
+private fun OneRoundWonder(onNavigateToOneRoundWonder: () -> Unit){
     Box(
         modifier = Modifier
             .border(
@@ -112,6 +115,9 @@ private fun OneRoundWonder(){
             .background(
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 shape = RoundedCornerShape(16.dp)
+            )
+            .clickable(
+                onClick = onNavigateToOneRoundWonder
             )
     ) {
         Row {
@@ -192,7 +198,9 @@ fun backgroundColour() = Brush.verticalGradient(
 @Composable
 fun HomeScreenPreview() {
     MaterialTheme {
-        HomeScreen()
+        HomeScreen(
+            onNavigateToOneRoundWonder = {}
+        )
     }
 }
 

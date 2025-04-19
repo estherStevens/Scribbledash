@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 object Home
 
 @Serializable
-object GameDifficultyLevel
+object GameDifficultyMode
 
 @Composable
 fun MainNavController() {
@@ -18,10 +18,16 @@ fun MainNavController() {
 
     NavHost(navController = navController, startDestination = Home){
         composable<Home> {
-            HomeScreen()
+            HomeScreen(
+                onNavigateToOneRoundWonder = {
+                    navController.navigate(GameDifficultyMode)
+                }
+            )
         }
-        composable<GameDifficultyLevel>{
-
+        composable<GameDifficultyMode>{
+            GameDifficultyScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }
