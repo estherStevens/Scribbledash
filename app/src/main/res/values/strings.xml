@@ -11,6 +11,6 @@
     <string name="game_difficulty_beginner">Beginner</string>
     <string name="game_difficulty_challenging">Challenging</string>
     <string name="game_difficulty_master">Master</string>
+    <string name="drawing_title">Time to draw!</string>
     <string name="drawing_clear_canvas">Clear canvas</string>
-
 </resources>
