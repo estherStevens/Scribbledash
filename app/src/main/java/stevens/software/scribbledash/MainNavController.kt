@@ -12,6 +12,9 @@ object Home
 @Serializable
 object GameDifficultyMode
 
+@Serializable
+object DrawingScreen
+
 @Composable
 fun MainNavController() {
     val navController = rememberNavController()
@@ -27,7 +30,14 @@ fun MainNavController() {
         composable<GameDifficultyMode>{
             GameDifficultyScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onDifficultyLevelClicked = {}
+                onDifficultyLevelClicked = {
+                    navController.navigate(DrawingScreen)
+                }
+            )
+        }
+        composable<DrawingScreen>{
+            DrawingScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }
