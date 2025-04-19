@@ -6,4 +6,6 @@
     <string name="home_header">Start drawing!</string>
     <string name="home_subheader">Select game mode</string>
     <string name="home_one_round_wonder">One Round \nWonder</string>
+    <string name="game_difficulty_title">Start drawing!</string>
+    <string name="game_difficulty_subtitle">Choose a difficulty setting</string>
 </resources>

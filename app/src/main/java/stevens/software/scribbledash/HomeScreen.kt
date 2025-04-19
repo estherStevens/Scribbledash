@@ -78,7 +78,7 @@ fun HomeScreen(
                         fontFamily = bagelFontFamily,
                         fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 44.sp
+                        fontSize = 40.sp
                     )
                 )
                 Spacer(Modifier.size(8.dp))
