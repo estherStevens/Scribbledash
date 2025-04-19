@@ -8,4 +8,7 @@
     <string name="home_one_round_wonder">One Round \nWonder</string>
     <string name="game_difficulty_title">Start drawing!</string>
     <string name="game_difficulty_subtitle">Choose a difficulty setting</string>
+    <string name="game_difficulty_beginner">Beginner</string>
+    <string name="game_difficulty_challenging">Challenging</string>
+    <string name="game_difficulty_master">Master</string>
 </resources>

@@ -26,7 +26,8 @@ fun MainNavController() {
         }
         composable<GameDifficultyMode>{
             GameDifficultyScreen(
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onDifficultyLevelClicked = {}
             )
         }
     }
