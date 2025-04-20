@@ -48,7 +48,8 @@ fun MainNavController() {
                 onPathEnd = { viewModel.onPathEnd() },
                 onPathStart = { viewModel.onNewPathStart() },
                 onNavigateBack = { navController.popBackStack() },
-                onUndo = { viewModel.undoPath() }
+                onUndo = { viewModel.undoPath() },
+                onRedo = { viewModel.redoPath() }
             )
         }
     }

@@ -55,7 +55,8 @@ fun DrawingScreen(
     onClearCanvas: () -> Unit,
     onPathEnd: () -> Unit,
     onNavigateBack: () -> Unit,
-    onUndo: () -> Unit
+    onUndo: () -> Unit,
+    onRedo: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -143,7 +144,8 @@ fun DrawingScreen(
 
                 Spacer(Modifier.weight(1f))
                 BottomBar(
-                    onUndo = onUndo
+                    onUndo = onUndo,
+                    onRedo = onRedo
                 )
             }
 
@@ -227,7 +229,8 @@ private fun DrawScope.drawPath(
 }
 
 @Composable
-fun BottomBar(onUndo: () -> Unit) {
+fun BottomBar(onUndo: () -> Unit,
+              onRedo : () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -256,7 +259,8 @@ fun BottomBar(onUndo: () -> Unit) {
                     color = MaterialTheme.colorScheme.surfaceContainerLow,
                     shape = RoundedCornerShape(22.dp)
                 )
-                .size(64.dp),
+                .size(64.dp)
+                .clickable { onRedo() },
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -312,7 +316,8 @@ fun DrawingScreenPreview() {
             onPathEnd = {},
             onPathStart = {},
             onClearCanvas = {},
-            onUndo = {}
+            onUndo = {},
+            onRedo = {}
         )
     }
 }

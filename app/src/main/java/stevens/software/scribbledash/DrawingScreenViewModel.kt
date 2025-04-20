@@ -78,4 +78,21 @@ class DrawingScreenViewModel : ViewModel() {
             )
         }
     }
+
+    fun redoPath(){
+        val undonePaths = _drawingState.value.undonePaths
+        if(undonePaths.isEmpty()) return
+
+        val paths = _drawingState.value.paths
+        val lastUndonePath = undonePaths.last()
+        val newUndonePathsList = undonePaths.subList(0, undonePaths.size -1)
+
+        _drawingState.update {
+            it.copy(
+                paths = paths + lastUndonePath,
+                undonePaths = newUndonePathsList
+            )
+        }
+
+    }
 }
