@@ -27,7 +27,8 @@ class DrawingScreenViewModel : ViewModel() {
         _drawingState.update {
             it.copy(
                 paths = emptyList(),
-                currentPath = null
+                currentPath = null,
+                undonePaths = emptyList()
             )
         }
     }
