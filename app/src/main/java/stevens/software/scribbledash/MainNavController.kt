@@ -47,7 +47,8 @@ fun MainNavController() {
                 onClearCanvas = { viewModel.clearCanvas() },
                 onPathEnd = { viewModel.onPathEnd() },
                 onPathStart = { viewModel.onNewPathStart() },
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onUndo = { viewModel.undoPath() }
             )
         }
     }

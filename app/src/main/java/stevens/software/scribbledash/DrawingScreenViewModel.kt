@@ -14,7 +14,8 @@ class DrawingScreenViewModel : ViewModel() {
 
     data class DrawingState(
         val paths: List<PathData> = emptyList(),
-        val currentPath: PathData? = null
+        val currentPath: PathData? = null,
+        val undonePaths: List<PathData> = emptyList()
     )
 
     data class PathData(
@@ -59,6 +60,21 @@ class DrawingScreenViewModel : ViewModel() {
                 currentPath = currentPathData.copy(
                     offsets = currentPathData.offsets + offset
                 )
+            )
+        }
+    }
+
+    fun undoPath(){
+        val paths = _drawingState.value.paths
+        if(paths.isEmpty()) return
+
+        val lastPath = paths.last()
+        val newPathsList = paths.subList(0, paths.size -1)
+
+        _drawingState.update {
+            it.copy(
+                paths = newPathsList,
+                undonePaths = it.undonePaths + lastPath
             )
         }
     }
