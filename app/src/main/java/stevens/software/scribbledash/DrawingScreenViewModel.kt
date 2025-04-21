@@ -5,14 +5,28 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import stevens.software.scribbledash.DrawingScreenViewModel.PathData
 import java.util.UUID
+
+sealed interface DrawingState{
+    data class ExampleDrawing(
+        val img: Int,
+        val countdown: Int,
+    ) : DrawingState
+
+    data class UserDrawingState(
+        val paths: List<PathData> = emptyList(),
+        val currentPath: PathData? = null,
+        val undonePaths: List<PathData> = emptyList()
+    ) : DrawingState
+}
 
 class DrawingScreenViewModel : ViewModel() {
 
-    private val _drawingState = MutableStateFlow(DrawingState())
+    private val _drawingState = MutableStateFlow(exampleDrawing())
     val drawingState = _drawingState.asStateFlow()
 
-    data class DrawingState(
+    data class UserDrawingState(
         val paths: List<PathData> = emptyList(),
         val currentPath: PathData? = null,
         val undonePaths: List<PathData> = emptyList()
@@ -23,19 +37,29 @@ class DrawingScreenViewModel : ViewModel() {
         val offsets: List<Offset>
     )
 
+    private fun exampleDrawing(): DrawingState.ExampleDrawing{
+        return DrawingState.ExampleDrawing(
+            img = R.drawable.whale,
+            countdown = 1
+        )
+    }
+
     fun clearCanvas() {
-        _drawingState.update {
-            it.copy(
+        val userDrawingState = _drawingState.value
+        if (userDrawingState is DrawingState.UserDrawingState) {
+            userDrawingState.copy(
                 paths = emptyList(),
                 currentPath = null,
                 undonePaths = emptyList()
             )
         }
+
     }
 
     fun onNewPathStart() {
-        _drawingState.update {
-            it.copy(
+        val userDrawingState = _drawingState.value
+        if (userDrawingState is DrawingState.UserDrawingState) {
+            userDrawingState.copy(
                 currentPath = PathData(
                     id = UUID.randomUUID().toString(),
                     offsets = emptyList()
@@ -45,19 +69,21 @@ class DrawingScreenViewModel : ViewModel() {
     }
 
     fun onPathEnd() {
-        val currentPathData = _drawingState.value.currentPath ?: return
-        _drawingState.update {
-            it.copy(
+        val userDrawingState = _drawingState.value
+        if (userDrawingState is DrawingState.UserDrawingState) {
+            val currentPathData = userDrawingState.currentPath ?: return
+            userDrawingState.copy(
                 currentPath = null,
-                paths = it.paths + currentPathData
+                paths = userDrawingState.paths + currentPathData
             )
         }
     }
 
     fun onDraw(offset: Offset) {
-        val currentPathData = _drawingState.value.currentPath ?: return
-        _drawingState.update {
-            it.copy(
+        val userDrawingState = _drawingState.value
+        if (userDrawingState is DrawingState.UserDrawingState) {
+            val currentPathData = userDrawingState.currentPath ?: return
+            userDrawingState.copy(
                 currentPath = currentPathData.copy(
                     offsets = currentPathData.offsets + offset
                 )
@@ -65,31 +91,34 @@ class DrawingScreenViewModel : ViewModel() {
         }
     }
 
-    fun undoPath(){
-        val paths = _drawingState.value.paths
-        if(paths.isEmpty()) return
+    fun undoPath() {
+        val userDrawingState = _drawingState.value
+        if (userDrawingState is DrawingState.UserDrawingState) {
+            val paths = userDrawingState.paths
+            if (paths.isEmpty()) return
 
-        val lastPath = paths.last()
-        val newPathsList = paths.subList(0, paths.size -1)
+            val lastPath = paths.last()
+            val newPathsList = paths.subList(0, paths.size - 1)
 
-        _drawingState.update {
-            it.copy(
+            userDrawingState.copy(
                 paths = newPathsList,
-                undonePaths = it.undonePaths + lastPath
+                undonePaths = userDrawingState.undonePaths + lastPath
             )
+
         }
     }
 
-    fun redoPath(){
-        val undonePaths = _drawingState.value.undonePaths
-        if(undonePaths.isEmpty()) return
+    fun redoPath() {
+        val userDrawingState = _drawingState.value
+        if (userDrawingState is DrawingState.UserDrawingState) {
+            val undonePaths = userDrawingState.undonePaths
+            if (undonePaths.isEmpty()) return
 
-        val paths = _drawingState.value.paths
-        val lastUndonePath = undonePaths.last()
-        val newUndonePathsList = undonePaths.subList(0, undonePaths.size -1)
+            val paths = userDrawingState.paths
+            val lastUndonePath = undonePaths.last()
+            val newUndonePathsList = undonePaths.subList(0, undonePaths.size - 1)
 
-        _drawingState.update {
-            it.copy(
+            userDrawingState.copy(
                 paths = paths + lastUndonePath,
                 undonePaths = newUndonePathsList
             )

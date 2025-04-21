@@ -13,4 +13,7 @@
     <string name="game_difficulty_master">Master</string>
     <string name="drawing_title">Time to draw!</string>
     <string name="drawing_clear_canvas">Clear canvas</string>
+    <string name="drawing_example_image_title">Ready, set…</string>
+    <string name="drawing_canvas_example_image_caption">Example</string>
+    <string name="drawing_canvas_user_drawing_caption">Your Drawing</string>
 </resources>

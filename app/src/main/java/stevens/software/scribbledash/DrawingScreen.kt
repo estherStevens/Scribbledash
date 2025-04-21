@@ -1,5 +1,6 @@
 package stevens.software.scribbledash
 
+import android.widget.Space
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -45,7 +47,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
-import stevens.software.scribbledash.DrawingScreenViewModel.DrawingState
 import stevens.software.scribbledash.ui.theme.extendedColours
 import kotlin.math.abs
 
@@ -75,85 +76,167 @@ fun DrawingScreen(
                 .padding(16.dp)
                 .clickable { onNavigateBack() }
         )
+
         Box(
             modifier = Modifier
                 .padding(horizontal = 29.dp)
-                .padding(bottom = 20.dp)
-            )
+                .padding(bottom = 20.dp))
         {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(Modifier.size(53.dp))
-                Text(
-                    text = stringResource(R.string.drawing_title),
-                    style = TextStyle(
-                        fontFamily = bagelFontFamily,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 40.sp,
+                when(uiState) {
+                    is DrawingState.ExampleDrawing -> ExampleDrawingUiState()
+                    is DrawingState.UserDrawingState -> UserDrawingUiState(
+                        drawnPaths = uiState.paths,
+                        currentPath = uiState.currentPath,
+                        onRedo = onRedo,
+                        onUndo = onUndo,
+                        onDraw = onDraw,
+                        onClearCanvas = onClearCanvas,
+                        onPathStart = onPathStart,
+                        onPathEnd = onPathEnd
                     )
-                )
-                Spacer(Modifier.size(32.dp))
-                val gridColour =  MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                        .background(Color.Transparent)
-                        .shadow(
-                            elevation = 1.dp,
-                            shape = RoundedCornerShape(36.dp),
-                            clip = false
-                        )
-                        .clip(RoundedCornerShape(36.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                ) {
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(12.dp)
-                            .clipToBounds()
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                shape = RoundedCornerShape(36.dp)
-                            )
-                            .pointerInput(true) {
-                                detectDragGestures(
-                                    onDragStart = { onPathStart() },
-                                    onDragEnd = { onPathEnd() },
-                                    onDrag = { change, _ -> onDraw(change.position) },
-                                    onDragCancel = { onPathStart() },
-                                )
-                            }
-                    ) {
-                        drawGrid(gridColour)
-                        uiState.paths.fastForEach { pathData ->
-                            drawPath(
-                                path = pathData.offsets,
-                                color = Color.Black,
-                            )
-                        }
-                        uiState.currentPath?.let {
-                            drawPath(
-                                path = it.offsets,
-                                color = Color.Black
-                            )
-                        }
-                    }
                 }
 
-                Spacer(Modifier.weight(1f))
-                BottomBar(
-                    onUndo = onUndo,
-                    onRedo = onRedo,
-                    onClearCanvas = onClearCanvas
-                )
             }
-
         }
     }
+
+}
+
+@Composable
+private fun ColumnScope.ExampleDrawingUiState() {
+    Title(text = R.string.drawing_example_image_title)
+    Spacer(Modifier.size(32.dp))
+    val gridColour =  MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .background(Color.Transparent)
+            .shadow(
+                elevation = 1.dp,
+                shape = RoundedCornerShape(36.dp),
+                clip = false
+            )
+            .clip(RoundedCornerShape(36.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp)
+                .clipToBounds()
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    shape = RoundedCornerShape(36.dp)
+                )
+        ) {
+            drawGrid(gridColour)
+        }
+    }
+    Spacer(Modifier.size(6.dp))
+    Caption(text = R.string.drawing_canvas_example_image_caption)
+}
+
+@Composable
+private fun ColumnScope.UserDrawingUiState(
+    drawnPaths: List<DrawingScreenViewModel.PathData>,
+    currentPath: DrawingScreenViewModel.PathData?,
+    onPathStart: () -> Unit,
+    onPathEnd: () -> Unit,
+    onClearCanvas: () -> Unit,
+    onDraw: (Offset) -> Unit,
+    onUndo: () -> Unit,
+    onRedo: () -> Unit,
+){
+    Title(text = R.string.drawing_title)
+    Spacer(Modifier.size(32.dp))
+    val gridColour =  MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .background(Color.Transparent)
+            .shadow(
+                elevation = 1.dp,
+                shape = RoundedCornerShape(36.dp),
+                clip = false
+            )
+            .clip(RoundedCornerShape(36.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp)
+                .clipToBounds()
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    shape = RoundedCornerShape(36.dp)
+                )
+                .pointerInput(true) {
+                    detectDragGestures(
+                        onDragStart = { onPathStart() },
+                        onDragEnd = { onPathEnd() },
+                        onDrag = { change, _ -> onDraw(change.position) },
+                        onDragCancel = { onPathStart() },
+                    )
+                }
+        ) {
+            drawGrid(gridColour)
+            drawnPaths.fastForEach { pathData ->
+                drawPath(
+                    path = pathData.offsets,
+                    color = Color.Black,
+                )
+            }
+            currentPath?.let {
+                drawPath(
+                    path = it.offsets,
+                    color = Color.Black
+                )
+            }
+        }
+    }
+    Spacer(Modifier.size(6.dp))
+    Caption(text = R.string.drawing_canvas_user_drawing_caption)
+
+    Spacer(Modifier.weight(1f))
+    BottomBar(
+        onUndo = onUndo,
+        onRedo = onRedo,
+        onClearCanvas = onClearCanvas
+    )
+}
+
+@Composable
+private fun Title(text: Int){
+    Text(
+        text = stringResource(text),
+        style = TextStyle(
+            fontFamily = bagelFontFamily,
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 40.sp,
+        )
+    )
+}
+
+@Composable
+private fun Caption(text: Int) {
+    Text(
+        text = stringResource(text),
+        style = TextStyle(
+            fontFamily = outfitFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 14.sp,
+        )
+    )
 }
 
 private fun DrawScope.drawGrid(gridColour: Color) {
@@ -327,7 +410,7 @@ fun BottomBar(onUndo: () -> Unit,
 fun DrawingScreenPreview() {
     MaterialTheme {
         DrawingScreen(
-            uiState = DrawingState(),
+            uiState = DrawingState.UserDrawingState(),
             onNavigateBack = {},
             onDraw = {},
             onPathEnd = {},
