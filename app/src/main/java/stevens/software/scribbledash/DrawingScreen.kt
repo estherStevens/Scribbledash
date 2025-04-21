@@ -88,7 +88,9 @@ fun DrawingScreen(
             ) {
                 Spacer(Modifier.size(53.dp))
                 when(uiState) {
-                    is DrawingState.ExampleDrawing -> ExampleDrawingUiState()
+                    is DrawingState.ExampleDrawing -> ExampleDrawingUiState(
+                        countdownTimeRemaining = uiState.countdown
+                    )
                     is DrawingState.UserDrawingState -> UserDrawingUiState(
                         drawnPaths = uiState.paths,
                         currentPath = uiState.currentPath,
@@ -108,7 +110,9 @@ fun DrawingScreen(
 }
 
 @Composable
-private fun ColumnScope.ExampleDrawingUiState() {
+private fun ColumnScope.ExampleDrawingUiState(
+    countdownTimeRemaining: Long
+) {
     Title(text = R.string.drawing_example_image_title)
     Spacer(Modifier.size(32.dp))
     val gridColour =  MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
@@ -140,12 +144,22 @@ private fun ColumnScope.ExampleDrawingUiState() {
     }
     Spacer(Modifier.size(6.dp))
     Caption(text = R.string.drawing_canvas_example_image_caption)
+    Spacer(Modifier.weight(1f))
+    Text(
+       text = stringResource(R.string.drawing_example_image_seconds_left, countdownTimeRemaining),
+        style = TextStyle(
+            fontFamily = bagelFontFamily,
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 40.sp,
+        )
+    )
 }
 
 @Composable
 private fun ColumnScope.UserDrawingUiState(
-    drawnPaths: List<DrawingScreenViewModel.PathData>,
-    currentPath: DrawingScreenViewModel.PathData?,
+    drawnPaths: List<PathData>,
+    currentPath: PathData?,
     onPathStart: () -> Unit,
     onPathEnd: () -> Unit,
     onClearCanvas: () -> Unit,

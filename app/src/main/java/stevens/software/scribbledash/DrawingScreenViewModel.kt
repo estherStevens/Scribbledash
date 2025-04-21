@@ -1,17 +1,21 @@
 package stevens.software.scribbledash
 
+import android.os.CountDownTimer
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import stevens.software.scribbledash.DrawingScreenViewModel.PathData
 import java.util.UUID
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 sealed interface DrawingState{
     data class ExampleDrawing(
         val img: Int,
-        val countdown: Int,
+        val countdown: Long,
     ) : DrawingState
 
     data class UserDrawingState(
@@ -21,108 +25,142 @@ sealed interface DrawingState{
     ) : DrawingState
 }
 
+data class PathData(
+    val id: String,
+    val offsets: List<Offset>
+)
+
 class DrawingScreenViewModel : ViewModel() {
 
-    private val _drawingState = MutableStateFlow(exampleDrawing())
+    private val _drawingState = MutableStateFlow<DrawingState>(exampleDrawing())
     val drawingState = _drawingState.asStateFlow()
 
-    data class UserDrawingState(
-        val paths: List<PathData> = emptyList(),
-        val currentPath: PathData? = null,
-        val undonePaths: List<PathData> = emptyList()
-    )
+    init {
+         object : CountDownTimer(3000L, 1000L) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsRemaining = millisUntilFinished.toDuration(DurationUnit.MILLISECONDS)
 
-    data class PathData(
-        val id: String,
-        val offsets: List<Offset>
-    )
+                _drawingState.update { currentState ->
+                    when(currentState is DrawingState.ExampleDrawing){
+                        true -> currentState.copy(countdown = secondsRemaining.roundedUpSeconds())
+                        false -> currentState
+                    }
+                }
+            }
+
+            override fun onFinish() {
+                _drawingState.value = DrawingState.UserDrawingState()
+            }
+        }.start()
+    }
 
     private fun exampleDrawing(): DrawingState.ExampleDrawing{
         return DrawingState.ExampleDrawing(
             img = R.drawable.whale,
-            countdown = 1
+            countdown = 3
         )
     }
 
     fun clearCanvas() {
-        val userDrawingState = _drawingState.value
-        if (userDrawingState is DrawingState.UserDrawingState) {
-            userDrawingState.copy(
-                paths = emptyList(),
-                currentPath = null,
-                undonePaths = emptyList()
-            )
+        _drawingState.update { currentState ->
+            when(currentState is DrawingState.UserDrawingState){
+                true -> {
+                    currentState.copy(
+                        paths = emptyList(),
+                        currentPath = null,
+                        undonePaths = emptyList()
+                    )
+                }
+                false -> currentState
+            }
         }
-
     }
 
     fun onNewPathStart() {
-        val userDrawingState = _drawingState.value
-        if (userDrawingState is DrawingState.UserDrawingState) {
-            userDrawingState.copy(
-                currentPath = PathData(
-                    id = UUID.randomUUID().toString(),
-                    offsets = emptyList()
-                )
-            )
+        _drawingState.update { currentState ->
+            when(currentState is DrawingState.UserDrawingState){
+                true -> {
+                    currentState.copy(
+                        currentPath = PathData(
+                            id = UUID.randomUUID().toString(),
+                            offsets = emptyList()
+                        )
+                    )
+                }
+                false -> currentState
+            }
         }
     }
 
     fun onPathEnd() {
-        val userDrawingState = _drawingState.value
-        if (userDrawingState is DrawingState.UserDrawingState) {
-            val currentPathData = userDrawingState.currentPath ?: return
-            userDrawingState.copy(
-                currentPath = null,
-                paths = userDrawingState.paths + currentPathData
-            )
+        _drawingState.update { currentState ->
+            when(currentState is DrawingState.UserDrawingState){
+                true -> {
+                    if(currentState.currentPath == null) return
+                    currentState.copy(
+                        currentPath = null,
+                        paths = currentState.paths + currentState.currentPath
+                    )
+                }
+                false -> currentState
+            }
         }
     }
 
     fun onDraw(offset: Offset) {
-        val userDrawingState = _drawingState.value
-        if (userDrawingState is DrawingState.UserDrawingState) {
-            val currentPathData = userDrawingState.currentPath ?: return
-            userDrawingState.copy(
-                currentPath = currentPathData.copy(
-                    offsets = currentPathData.offsets + offset
-                )
-            )
+        _drawingState.update { currentState ->
+            when(currentState is DrawingState.UserDrawingState){
+                true -> {
+                    if(currentState.currentPath == null) return
+                    currentState.copy(
+                        currentPath = currentState.currentPath.copy(
+                            offsets = currentState.currentPath.offsets + offset
+                        )
+                    )
+                }
+                false -> currentState
+            }
         }
     }
 
     fun undoPath() {
-        val userDrawingState = _drawingState.value
-        if (userDrawingState is DrawingState.UserDrawingState) {
-            val paths = userDrawingState.paths
-            if (paths.isEmpty()) return
-
-            val lastPath = paths.last()
-            val newPathsList = paths.subList(0, paths.size - 1)
-
-            userDrawingState.copy(
-                paths = newPathsList,
-                undonePaths = userDrawingState.undonePaths + lastPath
-            )
-
+        _drawingState.update { currentState ->
+            when(currentState is DrawingState.UserDrawingState){
+                true -> {
+                    if(currentState.paths.isEmpty()) return
+                    val lastPath = currentState.paths.last()
+                    val newPathsList = currentState.paths.subList(0, currentState.paths.size - 1)
+                    currentState.copy(
+                        paths = newPathsList,
+                        undonePaths = currentState.undonePaths + lastPath
+                    )
+                }
+                false -> currentState
+            }
         }
     }
 
     fun redoPath() {
-        val userDrawingState = _drawingState.value
-        if (userDrawingState is DrawingState.UserDrawingState) {
-            val undonePaths = userDrawingState.undonePaths
-            if (undonePaths.isEmpty()) return
+        _drawingState.update { currentState ->
+            when(currentState is DrawingState.UserDrawingState){
+                true -> {
+                    if(currentState.undonePaths.isEmpty()) return
+                    val paths = currentState.paths
+                    val lastUndonePath = currentState.undonePaths.last()
+                    val newUndonePathsList = currentState.undonePaths.subList(0, currentState.undonePaths.size - 1)
 
-            val paths = userDrawingState.paths
-            val lastUndonePath = undonePaths.last()
-            val newUndonePathsList = undonePaths.subList(0, undonePaths.size - 1)
-
-            userDrawingState.copy(
-                paths = paths + lastUndonePath,
-                undonePaths = newUndonePathsList
-            )
+                    currentState.copy(
+                        paths = paths + lastUndonePath,
+                        undonePaths = newUndonePathsList
+                    )
+                }
+                false -> currentState
+            }
         }
+    }
 
+    fun Duration.roundedUpSeconds(): Long {
+        val seconds = this.inWholeSeconds
+        return if (this - seconds.seconds > Duration.ZERO) seconds + 1 else seconds
     }
 }

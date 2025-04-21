@@ -16,4 +16,6 @@
     <string name="drawing_example_image_title">Ready, set…</string>
     <string name="drawing_canvas_example_image_caption">Example</string>
     <string name="drawing_canvas_user_drawing_caption">Your Drawing</string>
+    <string name="drawing_example_image_seconds_left">%s seconds left</string>
+
 </resources>
