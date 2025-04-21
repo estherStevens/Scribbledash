@@ -35,8 +35,8 @@ class DrawingScreenViewModel : ViewModel() {
     private val _drawingState = MutableStateFlow<DrawingState>(exampleDrawing())
     val drawingState = _drawingState.asStateFlow()
 
-    init {
-         object : CountDownTimer(3000L, 1000L) {
+    fun startTimer(){
+        object : CountDownTimer(3000L, 1000L) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsRemaining = millisUntilFinished.toDuration(DurationUnit.MILLISECONDS)
 
