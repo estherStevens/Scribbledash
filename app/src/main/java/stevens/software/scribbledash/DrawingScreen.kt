@@ -197,7 +197,7 @@ private fun DrawScope.drawGrid(gridColour: Color) {
 private fun DrawScope.drawPath(
     path: List<Offset>,
     color: Color,
-    thickness: Float = 10f
+    thickness: Float = 5f
 ) {
     val smoothedPath = Path().apply {
         if(path.isNotEmpty()) {
